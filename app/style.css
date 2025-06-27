@@ -1,0 +1,74 @@
+.body {
+    font-family: sans-serif;
+    background-color: #f8f9fa;
+    padding: 20px;
+    margin: 0;
+}
+
+.container{
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    min-width: 800px;
+    margin: auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.h1{
+    text-align: center;
+    color: #333;
+}
+
+.form p {
+    margin: 10px 0;
+}
+
+.input[type="text"],
+.input[type="number"],
+.select{
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.button{
+    padding: 8px 20px;
+    margin: 10px 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button[type="submit"]{
+    background-color: orange;
+    color: white;
+}
+
+.button[type="button"]{
+    background-color: skyblue;
+    color: white;
+}
+
+.table{
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.table th,
+.table td{
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+.table th{
+    background-color: #eee;
+}
+
+.action-buttons{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
