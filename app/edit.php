@@ -1,8 +1,8 @@
 <!-- 編集画面 -->
 
 <?php
-require_once 'db.php';
 
+require_once 'models/ProductModel.php';
 ob_start(); 
 // ↑出力バッファリングを開始（これ重要！！）
 
@@ -65,6 +65,8 @@ ob_end_flush();
 </head>
 <body>
     <div class="container">
+
+    <h1>商品情報編集画面</h1>
     <?php if ($error): ?>
         <p style="color:red;"><?= htmlspecialchars($error)?></p>
     <?php endif; ?>

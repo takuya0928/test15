@@ -1,6 +1,7 @@
 <!-- 詳細表示ページ -->
 <?php
-require_once 'db.php';
+
+require_once 'models/ProductModel.php';
 
 $id = $_GET['id'] ?? null;
 

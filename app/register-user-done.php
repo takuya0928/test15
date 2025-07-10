@@ -1,4 +1,6 @@
-<?php require 'db.php';
+
+<?php
+require_once 'models/ProductModel.php';
 // DB接続ファイルを読み込み
 
 $email = $_POST['email'];

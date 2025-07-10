@@ -1,7 +1,8 @@
 <!-- 削除処理ページ -->
 
 <?php
-require 'db.php';
+
+require_once 'models/ProductModel.php';
 
 $id = $_GET['id'] ?? null;
 

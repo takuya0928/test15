@@ -1,7 +1,8 @@
 <!-- 商品一覧画面 -->
 
 <?php
-require_once 'db.php';
+
+require_once 'models/ProductModel.php';
 
 $keyword = $_GET['keyword'] ?? '';
 $maker = $_GET['maker'] ?? '';
@@ -31,7 +32,8 @@ $products = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>商品一覧</title>
-    <link rel="stylesheet" href="assets/style.css">
+
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
