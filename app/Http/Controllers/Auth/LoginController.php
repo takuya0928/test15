@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
+
+
     // ログインフォーム表示
     public function showLoginForm()
     {
@@ -58,7 +60,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    protected $redirectTo = '/products';
 
     /**
      * Create a new controller instance.

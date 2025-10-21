@@ -10,7 +10,7 @@
     <title>商品管理システム</title>
 </head>
 <body>
-    <header>
+    <!-- <header>
         <nav>
             <a href="{{ route('products.index') }}">商品一覧</a>
             @auth
@@ -24,7 +24,22 @@
     
     <main>
         @yield('content')
-    </main>
+    </main> -->
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a href="{{ route('products.index') }}" class="navbar-brand">商品一覧</a>
+        </div>
+    </nav>
+    <div class="container">
+        @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @yield('content')
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script scr="{{ asset('js/custom.js') }}"></script>
+
 
 </body>
 </html>

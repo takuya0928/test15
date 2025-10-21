@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Http\Request;
+use App\Http\Requests\ProductRequest;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 
 class ProductController extends Controller
@@ -13,23 +16,9 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-
-        $query = Product::query();
-        // キーワード検索
-        if ($request->filled('keyword')){
-            $query->where('name', 'like', '%' . $request->keyword . '%');
-        }
-
-        // メーカー検索
-        if ($request->filled('maker')){
-            $query->where('maker', 'like', '%' . $request->maker . '%');
-        }
-
-        // ページネーション（1ページ １０件表示）
-        $products = $query->paginate(10)->withQueryString();
-
+        $products = Product::getAllProducts();
         return view('products.index', compact('products'));
     }
 
@@ -52,30 +41,20 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'maker' => 'required|string|max:255',
+            'name' => 'required|max:255',
             'price' => 'required|integer',
-            'stock' => 'required|integer',
-            'comment' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
+            'description' => 'nullable|string',
         ]);
-
-        $image_path = null;
-        if ($request->hasFile('image')){
-            $image_path = $request->file('image')->store('images', 'public');
+        try {
+            DB::beginTransaction();
+            Product::storeProduct($request->only(['name', 'price', 'description']));
+            DB::commit();
+            return redirect()->route('products.index')
+            ->with('success', config('message.register_success'));
+        }catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', config('message.register_error'));
         }
-
-        Product::create([
-            'name' => $request->name,
-            'maker' => $request->maker,
-            'price' => $request->price,
-            'stock' => $request->stock,
-            'comment' => $request->comment,
-            'image_path' => $image_path,
-        ]);
-
-        return redirect()->route('products.index')->with('success', '商品を登録しました');
-        // 一覧ページへ
     }
 
     /**
@@ -84,9 +63,8 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Product $product)
     {
-        $product = Product::findOrFail($id);
         return view('products.show', compact('product'));
     }
 
@@ -112,30 +90,20 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'maker' => 'required|string|max:255',
+            'name' => 'required|max:255',
             'price' => 'required|integer',
-            'stock' => 'required|integer',
-            'comment' => 'nullable|string',
-            'image' => 'nullable|image',
+            'description' => 'nullable|string',
         ]);
-
-        $product = Product::findOrFail($id);
-
-        if($request->hasFile('image')){
-            $imagePath = $request->file('image')->store('products', 'public');
-            $product->image_path = $imagePath;
+        try {
+            DB::beginTransaction();
+            Product::updateProduct($id, $request->only(['name', 'price', 'description']));
+            DB::commit();
+            return redirect()->route('products.index')
+            ->with('success', config('message.update_success'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', config('message.update_error'));
         }
-
-        $product->name = $request->name;
-        $product->maker = $request->maker;
-        $product->price = $request->price;
-        $product->stock = $request->stock;
-        $product->comment = $request->comment;
-        $product->save();
-
-        return redirect()->route('products.index')->with('success', '商品情報を更新しました。');
-
     }
 
     /**
@@ -146,15 +114,15 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
-
-        if($product->image_path && \Storage::exists('public/'.$product->image_path)) {
-            \Storage::delete('public/'.$product->image_path);
+        try{
+            DB::beginTransaction();
+            Product::deleteProduct($id);
+            DB::commit();
+            return redirect()->route('products.index')
+            ->with('success', config('message.delete_success'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', config('message.delete_error'));
         }
-
-        $product->delete();
-
-        return redirect()->route('products.index')->with('success', '商品を削除しました。');
-
     }
 }

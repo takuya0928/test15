@@ -4,28 +4,17 @@
 <div class="container">
 <h1>商品一覧画面</h1>
 
-    @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+@if(session('success'))
+<div class="alert alert-success">{{ session('success') }}</div>
+@endif
+@if(session('error'))
+<div class="alert alert-success">{{ session('error') }}</div>
+@endif
 
-<form action="{{ route('products.index') }}" method="GET" class="row mb-3">
-    <div class="col-md-4">
-        <input type="text" name="keyword" class="form-control" placeholder="検索キーワード" value="{{ request('keyword') }}">
-    </div>
-    <div class="col-md-4">
-        <input type="text" name="maker" class="form-control" placeholder="メーカー名" value="{{ request('maker') }}">
-    </div>
-    <div class="col-md-2">
-        <button type="submit" class="btn btn-primary w-100">検索</button>
-    </div>
-    <div class="col-md-2">
-        <a href="{{ route('products.index') }}" class="btn btn-secondary w-100">リセット</a>
-    </div>
-</form>
-
-<a href="{{ route('products.create') }}" class="btn btn-warning mb-3">新規登録</a>
+<a href="{{ route('products.create') }}" class="btn btn-primary mb-3">新規登録</a>
 
 <table class="table table-bordered">
+<thead>
 <tr>
 <th>ID</th>
 <th>商品名</th>
@@ -34,7 +23,9 @@
 <th>在庫数</th>
 <th>画像</th>
 </tr>
-@foreach ($products as $product)
+</thead>
+<tbody></tbody>
+@forelse ($products as $product)
 <tr>
 <td>{{ $product->id }}</td>
 <td>{{ $product->name }}</td>
@@ -49,7 +40,7 @@
     @endif
 </td>
 <td>
-    <a href="{{ route('products.show', $product->id) }}" class="btn btn-info btn-sm">詳細</a>
+    <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-warning">詳細</a>
     <form method="POST" action="{{ route('products.destroy', $product->id) }}" style="display:inline;">
         @csrf
         @method('DELETE')
@@ -58,10 +49,10 @@
 
 </td>
 </tr>
-@endforeach
+@empty
+<tr><td colspan="5">商品がありません。</td></tr>
+@endforelse
+</tbody>
 </table>
-<div class="d-flex justify-content-center">
-    {{ $products->links('pagination::bootstrap-4') }}
-</div>
 </div>
 @endsection
