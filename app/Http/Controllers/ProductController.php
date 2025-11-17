@@ -18,7 +18,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::getAllProducts();
+        $products = Product::orderBy('id', 'desc')->get();
         return view('products.index', compact('products'));
     }
 
@@ -118,11 +118,48 @@ class ProductController extends Controller
             DB::beginTransaction();
             Product::deleteProduct($id);
             DB::commit();
-            return redirect()->route('products.index')
-            ->with('success', config('message.delete_success'));
+            return response()->json([
+                'success' => true,
+                'message' => config('message.delete_success')
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', config('message.delete_error'));
+            return response()->json([
+                'success' => false,
+                'message' => config('message.delete_error'),
+                'error' => $e->getMessage()
+            ], 500);
         }
+    }
+
+    public function search(Request $request)
+    {
+        $query = Product::query();
+        // 名前検索
+        if ($request->filled('keyword')) {
+            $query->where('name', 'like', '%' . $request->keyword . '%');
+        }
+        // 価格範囲
+        if ($request->filled('price_min')) {
+            $query->where('price', '>=', $request->price_min);
+        }
+        if ($request->filled('price_max')) {
+            $query->where('price', '<=', $request->price_max);
+        }
+
+        // 在庫範囲
+        if ($request->filled('stock_min')) {
+            $query->where('stock', '>=', $request->stock_min);
+        }
+        if ($request->filled('stock_max')) {
+            $query->where('stock', '<=', $request->stock_max);
+        }
+
+        // ソート
+        $sort = in_array($request->sort, ['id', 'name', 'price', 'stock']) ? $request->sort : 'id';
+        $direction = ($request->direction === 'asc') ? 'asc' : 'desc';
+        $query->orderBy($sort, $direction);
+        $products = $query->get();
+        return view('products.partials.table', compact('products'));
     }
 }

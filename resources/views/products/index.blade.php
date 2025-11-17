@@ -8,51 +8,43 @@
 <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 @if(session('error'))
-<div class="alert alert-success">{{ session('error') }}</div>
+<div class="alert alert-danger">{{ session('error') }}</div>
 @endif
 
-<a href="{{ route('products.create') }}" class="btn btn-primary mb-3">新規登録</a>
+<!-- 検索フォーム -->
+<div class="card mb-3 p-3">
+    <div class="row g-2">
+        <div class="col-md-3">
+            <input type="text" id="keyword" class="form-control" placeholder="キーワードを入力">
+        </div>
+        <div class="col-md-2">
+            <input type="number" id="price_min" class="form-control" placeholder="価格（下限）">
+        </div>
+        <div class="col-md-2">
+            <input type="number" id="price_max" class="form-control" placeholder="価格（上限）">
+        </div>
+        <div class="col-md-2">
+            <input type="number" id="stock_min" class="form-control" placeholder="在庫（下限）">
+        </div>
+        <div class="col-md-2">
+            <input type="number" id="stock_max" class="form-control" placeholder="在庫（上限）">
+        </div>
+        <div class="col-md-1 d-grid">
+            <button id="searchBtn" class="btn btn-primary">検索</button>
+        </div>
+    </div>
+</div>
 
-<table class="table table-bordered">
-<thead>
-<tr>
-<th>ID</th>
-<th>商品名</th>
-<th>メーカー</th>
-<th>価格</th>
-<th>在庫数</th>
-<th>画像</th>
-</tr>
-</thead>
-<tbody></tbody>
-@forelse ($products as $product)
-<tr>
-<td>{{ $product->id }}</td>
-<td>{{ $product->name }}</td>
-<td>{{ $product->maker }}</td>
-<td>{{ $product->price }}</td>
-<td>{{ $product->stock }}</td>
-<td>
-    @if ($product->image_path)
-    <img src="{{ asset('storage/' . $product->image_path) }}" width="80" alt="商品画像">
-    @else
-    画像なし
-    @endif
-</td>
-<td>
-    <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-warning">詳細</a>
-    <form method="POST" action="{{ route('products.destroy', $product->id) }}" style="display:inline;">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('本当に削除しますか？')">削除</button>
-    </form>
+<a href="{{ route('products.create') }}" class="btn btn-success mb-3">新規登録</a>
 
-</td>
-</tr>
-@empty
-<tr><td colspan="5">商品がありません。</td></tr>
-@endforelse
-</tbody>
-</table>
+<div id="product-table"
+    data-search-url="{{ route('products.search') }}"
+    data-delete-base-url="{{ url('products') }}">
+    @include('products.partials.table')
+</div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/products.js') }}"></script>
+@endpush

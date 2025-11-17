@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\ProductController;
 
+use App\Http\Controllers\Api\PurchaseController;
+
 use App\Http\Controllers\Auth\LoginController;
 
 /*
@@ -17,42 +19,25 @@ use App\Http\Controllers\Auth\LoginController;
 |
 */
 
-Route::get('/', function () {return view('welcome');});
-
+// TOP → 商品一覧へリダイレクト
 Route::get('/', function () {
     return redirect()->route('products.index');
 });
 
+// ログイン機能
 Auth::routes();
 
+// ログイン後HOME
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::get('/list' , [App\Http\Controllers\ArticleController::class,'showList'])->name('list');
+// 商品一覧・登録・編集など（ログインが必要）
+Route::middleware(['auth'])->group(function () {
+    // 商品CRUD
+    Route::resource('products', ProductController::class);
+    // Ajax検索
+    Route::get('/products/search', [ProductController::class, 'search'])
+    ->name('products.search');
+});
 
-Route::get('/regist' , [App\Http\Controllers\ArticleController::class,'showRegistForm'])->name('regist');
-
-Route::post('/regist' , [App\Http\Controllers\ArticleController::class,'registSubmit'])->name('submit');
-
-Route::resource('products' , ProductController::class);
-
-Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
-
-Route::post('/products', [ProductController::class, 'store'])->name('products.store');
-
-Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
-
-Route::get('/dashboard', function () {return view('dashboard');})->middleware(['auth'])->name('dashboard');
-
-Route::middleware(['auth'])->group(function () {Route::resource('products', ProductController::class);});
-
-Route::post('login', [LoginController::class, 'login']);
-
-Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
-
-Route::post('logout', [LoginController::class, 'logout'])->name('logout');
-
-Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('Products.edit');
-
-Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
-
-Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+// Ajax 購入API
+Route::post('/api/purchase', [PurchaseController::class, 'purchase']);
